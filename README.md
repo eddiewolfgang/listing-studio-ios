@@ -8,7 +8,9 @@ A native SwiftUI iPhone app project implementing the personal listing workflow. 
 
 Features implemented:
 - Create and edit item title, USD price, condition, pickup area, notes and description.
-- Assemble descriptions from the supplied facts, with manual editing; this is formatting, not generative AI.
+- Generate a suggested title and description from up to three photos using Google Gemini, with explicit sharing consent and a review step.
+- Assemble descriptions from supplied facts without AI.
+- Copy a listing and open Facebook Marketplace to complete publishing manually.
 - Import up to 10 photos with the native photo picker; downsample images, reorder them and choose a cover.
 - Save listings and selected photos on the current iPhone with protected, atomic file writes.
 - Track Draft, Listed and Sold manually; delete listings and their saved photos.
@@ -61,3 +63,9 @@ NOT performed here: Swift compilation/type checking, XCTest execution, simulator
 - `Submission/`: editable App Store copy, privacy draft and release checklist.
 
 There are no API keys, third-party SDKs, package dependencies, ads, analytics, in-app purchases or Facebook credentials.
+
+## Family AI beta
+
+The app connects to the configured `AIServiceURL` in `ListingStudio/Info.plist`. The Google key stays in Cloudflare; do not put it in this repository or the app. On each phone, save the separate family access code in the AI photo description section, add photos, and tap Generate description from photos. Confirm sharing, review the draft, then choose Use draft.
+
+Run `iPhone TestFlight upload` on `main` in Codemagic. This workflow runs simulator tests before signing and uploading the archive. Real-device photo selection, Keychain access, and Facebook handoff still need testing in TestFlight.

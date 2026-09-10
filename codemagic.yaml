@@ -33,10 +33,41 @@ workflows:
           info['PrivacyPolicyURL'] = 'https://listing-studio-support.eddiewolfgang.chatgpt.site/privacy.html'
           with open('ListingStudio/Info.plist', 'wb') as f:
               plistlib.dump(info, f)
-          for key in ('PrivacyPolicyURL', 'SupportURL'):
+          for key in ('PrivacyPolicyURL', 'SupportURL', 'AIServiceURL'):
               if not info.get(key, '').startswith('https://'):
                   raise SystemExit(f'Set a published {key} in ListingStudio/Info.plist before starting this workflow.')
           PY
+      - name: Run iPhone simulator tests before upload
+        script: |
+          set -euo pipefail
+          mkdir -p build
+          xcrun simctl list devices available --json > build/simulators.json
+          LISTING_SIMULATOR_ID=$(python3 - <<'PY'
+          import json
+          with open('build/simulators.json') as f:
+              devices = json.load(f)['devices']
+          phones = [d['udid'] for runtime, rows in devices.items()
+                    if '.iOS-' in runtime for d in rows
+                    if d.get('isAvailable') and d['name'].startswith('iPhone')]
+          if not phones:
+              raise SystemExit('No available iPhone simulator found on this build machine.')
+          print(phones[0])
+          PY
+          )
+          xcodebuild test \
+            -project ListingStudio.xcodeproj \
+            -scheme ListingStudio \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,id=$LISTING_SIMULATOR_ID" \
+            -destination-timeout 120 \
+            -parallel-testing-enabled NO \
+            -derivedDataPath build/DerivedData \
+            -resultBundlePath build/ListingStudioTests.xcresult \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build/xcodebuild.log
       - name: Apply signing profile
         script: xcode-project use-profiles
       - name: Build signed iPhone archive
