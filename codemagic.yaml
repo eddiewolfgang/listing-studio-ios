@@ -1,5 +1,60 @@
-# Manual simulator validation only. No Apple keys or App Store publishing.
+# Manual simulator tests and signed TestFlight uploads.
 workflows:
+  ios-testflight:
+    name: iPhone TestFlight upload
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    integrations:
+      app_store_connect: Codemagic
+    environment:
+      xcode: latest
+      ios_signing:
+        provisioning_profiles:
+          - listing_studio_profile
+        certificates:
+          - listing_studio_appstore
+    scripts:
+      - name: Prepare release settings
+        script: |
+          set -euo pipefail
+          chmod +x Scripts/release-check.sh
+          python3 - <<'PY'
+          from pathlib import Path
+          import plistlib
+          project = Path('ListingStudio.xcodeproj/project.pbxproj')
+          text = project.read_text()
+          text = text.replace('com.example.ListingStudioTests', 'com.eddiewolfgang.listingstudio.tests')
+          text = text.replace('com.example.ListingStudio', 'com.eddiewolfgang.listingstudio')
+          text = text.replace('"DEVELOPMENT_TEAM" = "";', '"DEVELOPMENT_TEAM" = "D7L36K7WKD";')
+          project.write_text(text)
+          with open('ListingStudio/Info.plist', 'rb') as f:
+              info = plistlib.load(f)
+          info['SupportURL'] = 'https://listing-studio-support.eddiewolfgang.chatgpt.site'
+          info['PrivacyPolicyURL'] = 'https://listing-studio-support.eddiewolfgang.chatgpt.site/privacy.html'
+          with open('ListingStudio/Info.plist', 'wb') as f:
+              plistlib.dump(info, f)
+          for key in ('PrivacyPolicyURL', 'SupportURL'):
+              if not info.get(key, '').startswith('https://'):
+                  raise SystemExit(f'Set a published {key} in ListingStudio/Info.plist before starting this workflow.')
+          PY
+      - name: Apply signing profile
+        script: xcode-project use-profiles
+      - name: Build signed iPhone archive
+        script: |
+          set -euo pipefail
+          xcode-project build-ipa \
+            --project ListingStudio.xcodeproj \
+            --scheme ListingStudio \
+            --config Release \
+            --archive-xcargs "CURRENT_PROJECT_VERSION=$((BUILD_NUMBER + 1))"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false
   ios-simulator-check:
     name: iPhone build and tests
     instance_type: mac_mini_m2
