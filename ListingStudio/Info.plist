@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AIServiceURL</key>
+	<string>https://listing-studio-ai.eddiewolfgang87.workers.dev/describe</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -25,9 +27,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>PrivacyPolicyURL</key>
-	<string></string>
+	<string>https://listing-studio-support.eddiewolfgang.chatgpt.site/privacy.html</string>
 	<key>SupportURL</key>
-	<string></string>
+	<string>https://listing-studio-support.eddiewolfgang.chatgpt.site</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -15,7 +15,8 @@ struct AboutView: View {
                     Text("Independent listing organizer. Not affiliated with or endorsed by Meta or Facebook. Facebook publishing is manual.").font(.footnote).foregroundStyle(.secondary)
                 }
                 Section("Your data") {
-                    Text("Listings and selected photos are stored in this app on your iPhone. There is no account, server upload, analytics, advertising or tracking in this version.")
+                    Text("Listings and selected photos are stored in this app on your iPhone. There is no app account, analytics, advertising or tracking. If you choose AI generation and confirm sharing, up to three photos and your item details are uploaded through our service to Google Gemini.")
+                    Text("Google may use free-tier AI inputs and outputs to improve its products. AI is optional; review generated drafts before using them. Your family access code is saved in this phone’s Keychain. Use Forget saved access code to remove it.")
                     Text("Your device backup may include this app’s data, depending on your Apple backup settings. This app does not synchronize listings between devices or with the web app.")
                     Text("When you copy or share a listing, you choose which app receives that content. Opening Facebook or a support website uses that service’s own privacy practices.")
                     Text("To remove a listing and its saved photos, open it and choose Delete listing. Removing this app also removes its local data; backups are managed separately in your Apple settings.")
